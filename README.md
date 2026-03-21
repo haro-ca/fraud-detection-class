@@ -46,12 +46,16 @@ uv run python manage.py runserver
 |---|-------|------------|
 | #1 | **Epic**: credit approvals must show in app after fraud pipeline | — |
 | #2 | Extract fraud rules from notebook into `src/` modules | — |
-| #3 | Batch ETL pipeline — Neon → DuckDB / Databricks | #2 |
+| #9 | ↳ Extract each fraud rule into a callable function | — |
+| #10 | ↳ Add tests for the extracted rules | #9 |
+| #11 | ↳ Create entry point and wire notebook to extracted modules | #9, #10 |
+| #3 | Batch ETL pipeline — Neon → DuckDB / Databricks (optional) | #2 |
 | #4 | Fraud status API endpoint + Django integration | #3 |
 | #5 | CLI for pipeline operations via Rich/Typer | #3 |
 | #6 | Fraud review queue in Django admin | #4 |
 | #7 | MCP server for application status | #4, #5 |
 | #8 | Streamlit analytics dashboard over OLAP layer | #3 |
+| #12 | Add logging to the fraud pipeline | #3 |
 
 ## Database permissions
 
@@ -68,7 +72,7 @@ Students have scoped access to the shared Neon database:
 ## Tech stack
 
 - Python 3.12+
-- Django 6
+- Django 5.1+
 - PostgreSQL (Neon) — OLTP
 - DuckDB / Databricks — OLAP (you'll build this)
 - Polars (not pandas)

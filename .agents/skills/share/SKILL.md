@@ -1,3 +1,9 @@
+---
+name: share
+description: Export a conversation summary as a learning log for instructor review
+user_invocable: true
+---
+
 Write a conversation summary to `conversations/` in the project root. The file should be named with today's date and a short slug, e.g. `conversations/2026-03-21-etl-pipeline.md`.
 
 Create the `conversations/` directory if it doesn't exist.

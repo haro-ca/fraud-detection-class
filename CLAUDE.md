@@ -42,6 +42,8 @@ uv run ruff format .
 - **Python 3.12+** — do not downgrade
 - Keep Django models with `managed = False` — tables are managed by Neon, not Django migrations
 - Connection string comes from `DATABASE_URL` in `.env`
+- **gh** CLI for all GitHub operations (issues, PRs, checks) — not the web UI
+- **databricks** CLI for Databricks workspace operations — not the web UI
 
 ## Architecture
 
