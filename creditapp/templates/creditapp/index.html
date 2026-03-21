@@ -1,0 +1,28 @@
+{% extends "creditapp/base.html" %}
+
+{% block title %}CreditGuard — Applications{% endblock %}
+
+{% block content %}
+<h1>Credit Applications</h1>
+
+{% for app in applications %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <strong>{{ app.applicant_name }}</strong><br>
+            <span class="amount">${{ app.requested_amount|floatformat:2 }}</span>
+            &middot; {{ app.employment_status }}
+            &middot; {{ app.created_at|date:"M d, Y" }}
+        </div>
+        <div>
+            <span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span>
+            <a href="{% url 'creditapp:status' app.id %}" class="btn" style="margin-left: 0.5rem;">View</a>
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="card">
+    <p>No applications yet. <a href="{% url 'creditapp:apply' %}">Submit one.</a></p>
+</div>
+{% endfor %}
+{% endblock %}

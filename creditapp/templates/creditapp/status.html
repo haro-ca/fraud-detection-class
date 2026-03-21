@@ -1,0 +1,30 @@
+{% extends "creditapp/base.html" %}
+
+{% block title %}Application Status{% endblock %}
+
+{% block content %}
+<h1>Application #{{ application.id }}</h1>
+
+<div class="card">
+    <h2>{{ application.applicant_name }}</h2>
+    <p>
+        <strong>Requested:</strong> <span class="amount">${{ application.requested_amount|floatformat:2 }}</span><br>
+        <strong>Annual Income:</strong> ${{ application.annual_income|floatformat:2 }}<br>
+        <strong>Employment:</strong> {{ application.employment_status }}<br>
+        <strong>Applied:</strong> {{ application.created_at|date:"M d, Y H:i" }}
+    </p>
+    <br>
+    <p>
+        <strong>Status:</strong>
+        <span class="badge badge-{{ application.status }}">{{ application.get_status_display }}</span>
+    </p>
+
+    {% if application.status == "pending" %}
+    <br>
+    <p style="color: #666;">
+        Your application is being reviewed. Fraud analysis results will appear here
+        once the pipeline has processed your application.
+    </p>
+    {% endif %}
+</div>
+{% endblock %}

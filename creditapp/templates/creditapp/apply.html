@@ -1,0 +1,35 @@
+{% extends "creditapp/base.html" %}
+
+{% block title %}Apply for Credit{% endblock %}
+
+{% block content %}
+<h1>Apply for Credit</h1>
+<div class="card">
+    <form method="post">
+        {% csrf_token %}
+        <label for="applicant_name">Full Name</label>
+        <input type="text" name="applicant_name" required>
+
+        <label for="email">Email</label>
+        <input type="email" name="email" required>
+
+        <label for="ssn_last4">SSN (last 4 digits)</label>
+        <input type="text" name="ssn_last4" maxlength="4" pattern="\d{4}" required>
+
+        <label for="annual_income">Annual Income ($)</label>
+        <input type="number" name="annual_income" step="0.01" required>
+
+        <label for="requested_amount">Requested Amount ($)</label>
+        <input type="number" name="requested_amount" step="0.01" required>
+
+        <label for="employment_status">Employment Status</label>
+        <select name="employment_status" required>
+            <option value="employed">Employed</option>
+            <option value="self-employed">Self-Employed</option>
+            <option value="unemployed">Unemployed</option>
+        </select>
+
+        <button type="submit" class="btn">Submit Application</button>
+    </form>
+</div>
+{% endblock %}
