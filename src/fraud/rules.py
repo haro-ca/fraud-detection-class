@@ -13,6 +13,7 @@ from .constants import (
     UNUSUAL_HOURS_START,
     UNUSUAL_HOURS_END,
     UNUSUAL_HOURS_THRESHOLD,
+    REJECTION_THRESHOLD,
 )
 
 
@@ -173,3 +174,19 @@ def run_all(transactions: pl.DataFrame, applications: pl.DataFrame) -> list[dict
 
 def to_dataframe(results: list[dict]) -> pl.DataFrame:
     return pl.DataFrame(results)
+
+
+def decide_applications(results: list[dict]) -> pl.DataFrame:
+    df = pl.DataFrame(results)
+    summary = df.group_by("application_id").agg(
+        pl.col("triggered").sum().alias("rules_triggered"),
+        pl.col("score").mean().alias("avg_score"),
+        pl.col("score").max().alias("max_score"),
+    )
+    summary = summary.with_columns(
+        pl.when(pl.col("rules_triggered") >= REJECTION_THRESHOLD)
+        .then(pl.lit("rejected"))
+        .otherwise(pl.lit("approved"))
+        .alias("decision")
+    )
+    return summary
