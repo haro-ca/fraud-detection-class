@@ -19,7 +19,7 @@
                 <th>Category</th>
                 <th class="text-right">Amount</th>
                 <th>Country</th>
-                <th style="text-align: center;">Channel</th>
+                <th>Channel</th>
             </tr>
         </thead>
         <tbody>
@@ -33,7 +33,7 @@
                 </td>
                 <td class="mono text-right">${{ tx.amount|floatformat:2 }}</td>
                 <td><span class="country-code">{{ tx.location_country }}</span></td>
-                <td style="text-align: center;">{% if tx.is_online %}<span class="online-dot" title="Online"></span>{% else %}<span class="offline-dot" title="In-store"></span>{% endif %}</td>
+                <td>{% if tx.is_online %}Online{% else %}In-store{% endif %}</td>
             </tr>
             {% empty %}
             <tr>
