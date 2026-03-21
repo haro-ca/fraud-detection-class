@@ -1,30 +1,50 @@
 {% extends "creditapp/base.html" %}
 
-{% block title %}Application Status{% endblock %}
+{% block nav_applications %}active{% endblock %}
+{% block title %}Application #{{ application.id }} — CreditGuard{% endblock %}
 
 {% block content %}
-<h1>Application #{{ application.id }}</h1>
-
-<div class="card">
-    <h2>{{ application.applicant_name }}</h2>
-    <p>
-        <strong>Requested:</strong> <span class="amount">${{ application.requested_amount|floatformat:2 }}</span><br>
-        <strong>Annual Income:</strong> ${{ application.annual_income|floatformat:2 }}<br>
-        <strong>Employment:</strong> {{ application.employment_status }}<br>
-        <strong>Applied:</strong> {{ application.created_at|date:"M d, Y H:i" }}
-    </p>
-    <br>
-    <p>
-        <strong>Status:</strong>
+<div class="page-header animate-in">
+    <h1 style="display: flex; align-items: center; gap: 0.75rem;">
+        {{ application.applicant_name }}
         <span class="badge badge-{{ application.status }}">{{ application.get_status_display }}</span>
-    </p>
-
-    {% if application.status == "pending" %}
-    <br>
-    <p style="color: #666;">
-        Your application is being reviewed. Fraud analysis results will appear here
-        once the pipeline has processed your application.
-    </p>
-    {% endif %}
+    </h1>
+    <p class="subtitle">Application <span class="mono">#{{ application.id }}</span> &middot; {{ application.created_at|date:"M d, Y H:i" }}</p>
 </div>
+
+<div class="card animate-in" style="animation-delay: 0.05s;">
+    <div class="detail-grid">
+        <div class="detail-item">
+            <div class="label">Requested Amount</div>
+            <div class="amount-large">${{ application.requested_amount|floatformat:2 }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="label">Annual Income</div>
+            <div class="value mono">${{ application.annual_income|floatformat:2 }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="label">Employment</div>
+            <div class="value">{{ application.employment_status }}</div>
+        </div>
+        <div class="detail-item">
+            <div class="label">Email</div>
+            <div class="value" style="font-size: 0.85rem;">{{ application.email }}</div>
+        </div>
+    </div>
+</div>
+
+{% if application.status == "pending" %}
+<div class="card animate-in" style="animation-delay: 0.1s; border-left: 2px solid var(--yellow);">
+    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+        <span style="color: var(--yellow); font-size: 1.1rem; line-height: 1;">&#9679;</span>
+        <div>
+            <div style="font-weight: 600; margin-bottom: 0.25rem;">Awaiting Fraud Pipeline</div>
+            <div style="font-size: 0.84rem; color: var(--text-secondary);">
+                This application is queued for fraud analysis. Results will appear here
+                once the pipeline has processed the applicant's transaction history.
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
