@@ -2,7 +2,7 @@
 
 ## Project overview
 
-CreditGuard is a Django credit application system with a fraud detection pipeline. The fraud logic currently lives in a messy Jupyter notebook (`notebooks/fraud_analysis.ipynb`) and needs to be productionized into proper Python modules.
+Santandors is a Django credit application system with a fraud detection pipeline. The fraud logic currently lives in a messy Jupyter notebook (`notebooks/fraud_analysis.ipynb`) and needs to be productionized into proper Python modules.
 
 ## Commands
 

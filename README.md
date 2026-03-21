@@ -1,10 +1,10 @@
-# CreditGuard — Fraud Detection Class
+# Santandors — Fraud Detection Class
 
 A real-world Python engineering class built around a credit application fraud detection system. Students work through progressive issues to transform a messy data science notebook into production-grade software.
 
 ## The scenario
 
-CreditGuard is a Django app where people apply for credit. A fraud pipeline analyzes their transaction history and determines whether applications should be approved or rejected. Right now the fraud logic lives in a messy Jupyter notebook — your job is to productionize it.
+Santandors is a Django app where people apply for credit. A fraud pipeline analyzes their transaction history and determines whether applications should be approved or rejected. Right now the fraud logic lives in a messy Jupyter notebook — your job is to productionize it.
 
 ## Architecture
 
