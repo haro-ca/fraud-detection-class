@@ -3,7 +3,7 @@ name = "fraud-detection-class"
 version = "0.1.0"
 description = "Credit application fraud detection — Python engineering class"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 dependencies = [
     "django>=5.1",
     "psycopg2-binary>=2.9",
