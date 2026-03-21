@@ -4,19 +4,14 @@ A real-world Python engineering class built around a credit application fraud de
 
 ## The scenario
 
-Santandors is a Django app where people apply for credit. A fraud pipeline analyzes their transaction history and determines whether applications should be approved or rejected. Right now the fraud logic lives in a messy Jupyter notebook — your job is to productionize it.
+Santandors is a Django app where people apply for credit. A fraud pipeline should analyze their transaction history and determine whether applications get approved or rejected. Right now the fraud logic lives in a messy Jupyter notebook and everything runs against the production database — your job is to productionize it.
 
-## Architecture
-
-- **Django app** — credit application form, status page, admin
-- **Neon (PostgreSQL)** — OLTP database with `credit_applications`, `transactions`, `fraud_results`
-- **Jupyter notebook** — messy fraud analysis with 5 rules (to be refactored)
-- **Transaction simulator** — generates live transaction data at ~1/sec
+See [Issue #1](https://github.com/haro-ca/fraud-detection-class/issues/1) for the full epic, architecture diagrams (as-is vs to-be), and sub-issues.
 
 ## Setup
 
 ```bash
-# clone and enter your branch
+# clone and create your branch
 git clone https://github.com/haro-ca/fraud-detection-class.git
 cd fraud-detection-class
 git checkout -b new-applications-approval<YOUR_TEAM_NUMBER>
@@ -26,13 +21,10 @@ uv sync
 
 # configure environment
 cp .env.example .env
-# edit .env with your Neon connection string and Django secret key
+# replace PASSWORD in .env with the credential shared by the instructor
 
 # run the app
 uv run python manage.py runserver
-
-# run the transaction simulator (separate terminal)
-uv run python scripts/transactions.py
 ```
 
 ## Project structure
@@ -43,21 +35,41 @@ uv run python scripts/transactions.py
 ├── notebooks/
 │   └── fraud_analysis.ipynb  # Messy notebook — your starting point
 ├── scripts/
-│   └── transactions.py     # Transaction feed simulator
+│   └── transactions.py     # Transaction feed simulator (instructor-only)
 ├── manage.py
 └── pyproject.toml
 ```
 
-## The main issue
+## Issues
 
-**feat: credit approvals must show in app after they've completed fraud pipeline**
+| # | Issue | Depends on |
+|---|-------|------------|
+| #1 | **Epic**: credit approvals must show in app after fraud pipeline | — |
+| #2 | Extract fraud rules from notebook into `src/` modules | — |
+| #3 | Batch ETL pipeline — Neon → DuckDB / Databricks | #2 |
+| #4 | Fraud status API endpoint + Django integration | #3 |
+| #5 | CLI for pipeline operations via Rich/Typer | #3 |
+| #6 | Fraud review queue in Django admin | #4 |
+| #7 | MCP server for application status | #4, #5 |
+| #8 | Streamlit analytics dashboard over OLAP layer | #3 |
 
-The status page currently always shows "pending". Your job is to build the full pipeline so applications get approved or rejected based on fraud analysis results.
+## Database permissions
+
+Students have scoped access to the shared Neon database:
+
+| Table | SELECT | INSERT | UPDATE | DELETE |
+|---|---|---|---|---|
+| `credit_applications` | yes | yes (via `/apply`) | `status` column only | no |
+| `transactions` | yes | no | no | no |
+| `fraud_results` | yes | yes | no | yes |
+
+`scripts/transactions.py` is instructor-only — it generates live transaction data and new credit applications. You'll see data flowing in when the instructor runs it.
 
 ## Tech stack
 
 - Python 3.12+
-- Django
-- PostgreSQL (Neon)
+- Django 6
+- PostgreSQL (Neon) — OLTP
+- DuckDB / Databricks — OLAP (you'll build this)
 - Polars (not pandas)
 - uv for dependency management
