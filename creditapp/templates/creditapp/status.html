@@ -38,10 +38,81 @@
     <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
         <span style="color: var(--yellow); font-size: 1.1rem; line-height: 1;">&#9679;</span>
         <div>
-            <div style="font-weight: 600; margin-bottom: 0.25rem;">Awaiting Fraud Pipeline</div>
+            <div style="font-weight: 600; margin-bottom: 0.25rem;">Awaiting Fraud Analysis</div>
             <div style="font-size: 0.84rem; color: var(--text-secondary);">
                 This application is queued for fraud analysis. Results will appear here
                 once the pipeline has processed the applicant's transaction history.
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if fraud_results %}
+<div class="card animate-in" style="animation-delay: 0.15s;">
+    <h3 style="margin: 0 0 1rem 0;">Fraud Analysis Results</h3>
+    
+    {% with fraud_results|length as flag_count %}
+    {% with fraud_results|dictsort:"triggered"|reversed as sorted_results %}
+    
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 1px solid var(--border);">
+                <th style="text-align: left; padding: 0.5rem 0; color: var(--text-secondary); font-size: 0.8rem;">Rule</th>
+                <th style="text-align: center; padding: 0.5rem; color: var(--text-secondary); font-size: 0.8rem;">Status</th>
+                <th style="text-align: right; padding: 0.5rem 0; color: var(--text-secondary); font-size: 0.8rem;">Score</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for result in sorted_results %}
+            <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 0.75rem 0;">
+                    <div style="font-weight: 500;">{{ result.rule_name|upper }}</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.25rem;">{{ result.details }}</div>
+                </td>
+                <td style="text-align: center; padding: 0.75rem;">
+                    {% if result.triggered %}
+                    <span style="background: var(--red); color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">FLAGGED</span>
+                    {% else %}
+                    <span style="background: var(--green); color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">CLEAN</span>
+                    {% endif %}
+                </td>
+                <td style="text-align: right; padding: 0.75rem 0; font-family: monospace;">
+                    {{ result.score|floatformat:1 }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    {% endwith %}
+    {% endwith %}
+</div>
+{% endif %}
+
+{% if application.status == "approved" %}
+<div class="card animate-in" style="animation-delay: 0.2s; border-left: 2px solid var(--green); background: rgba(46, 204, 113, 0.05);">
+    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+        <span style="color: var(--green); font-size: 1.1rem; line-height: 1;">&#10003;</span>
+        <div>
+            <div style="font-weight: 600; margin-bottom: 0.25rem; color: var(--green);">Application Approved</div>
+            <div style="font-size: 0.84rem; color: var(--text-secondary);">
+                Congratulations! Your credit application has been approved.
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% if application.status == "rejected" %}
+<div class="card animate-in" style="animation-delay: 0.2s; border-left: 2px solid var(--red); background: rgba(231, 76, 60, 0.05);">
+    <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+        <span style="color: var(--red); font-size: 1.1rem; line-height: 1;">&#10007;</span>
+        <div>
+            <div style="font-weight: 600; margin-bottom: 0.25rem; color: var(--red);">Application Rejected</div>
+            <div style="font-size: 0.84rem; color: var(--text-secondary);">
+                Unfortunately, your application did not pass our fraud screening criteria.
+                Please contact support for more information.
             </div>
         </div>
     </div>
