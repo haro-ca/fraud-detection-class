@@ -1,0 +1,43 @@
+{% extends "creditapp/base.html" %}
+
+{% block title %}Transaction Feed{% endblock %}
+
+{% block content %}
+<h1>Transaction Feed</h1>
+<p style="color: #666; margin-bottom: 1rem;">Latest 50 transactions. Refresh to see new ones.</p>
+
+<table style="width: 100%; border-collapse: collapse;">
+    <thead>
+        <tr style="background: #1a1a2e; color: white; text-align: left;">
+            <th style="padding: 0.75rem;">Time</th>
+            <th style="padding: 0.75rem;">Applicant</th>
+            <th style="padding: 0.75rem;">Merchant</th>
+            <th style="padding: 0.75rem;">Category</th>
+            <th style="padding: 0.75rem; text-align: right;">Amount</th>
+            <th style="padding: 0.75rem;">Country</th>
+            <th style="padding: 0.75rem;">Online</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for tx in transactions %}
+        <tr style="background: {% cycle 'white' '#f8f9fa' %}; border-bottom: 1px solid #eee;">
+            <td style="padding: 0.6rem 0.75rem;">{{ tx.transaction_time|date:"M d H:i:s" }}</td>
+            <td style="padding: 0.6rem 0.75rem;">
+                <a href="{% url 'creditapp:status' tx.applicant_id %}">{{ tx.applicant.applicant_name }}</a>
+            </td>
+            <td style="padding: 0.6rem 0.75rem;">{{ tx.merchant }}</td>
+            <td style="padding: 0.6rem 0.75rem;">{{ tx.category }}</td>
+            <td style="padding: 0.6rem 0.75rem; text-align: right;">${{ tx.amount|floatformat:2 }}</td>
+            <td style="padding: 0.6rem 0.75rem;">{{ tx.location_country }}</td>
+            <td style="padding: 0.6rem 0.75rem;">{% if tx.is_online %}Yes{% else %}—{% endif %}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7" style="padding: 1.5rem; text-align: center; color: #666;">
+                No transactions yet. Run <code>uv run python scripts/transactions.py</code> to generate data.
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .models import CreditApplication
+from .models import CreditApplication, Transaction
 
 
 def index(request):
@@ -25,3 +25,12 @@ def apply_credit(request):
 def application_status(request, application_id):
     application = get_object_or_404(CreditApplication, id=application_id)
     return render(request, "creditapp/status.html", {"application": application})
+
+
+def transactions_feed(request):
+    transactions = Transaction.objects.select_related("applicant").order_by(
+        "-transaction_time"
+    )[:50]
+    return render(
+        request, "creditapp/transactions.html", {"transactions": transactions}
+    )

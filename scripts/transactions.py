@@ -1,6 +1,7 @@
 """
-Simulates a bank transaction feed by inserting credit solicitudes into Neon
-every ~1 second. Run this in the background to generate live data.
+Simulates a bank feed: inserts card transactions every ~1 second
+and new credit applications every ~5 seconds.
+Run this in the background to generate live data.
 
 Usage:
     uv run python scripts/transactions.py
@@ -33,6 +34,23 @@ MERCHANTS = {
 }
 
 COUNTRIES = ["US", "US", "US", "US", "US", "GB", "FR", "DE", "MX", "NG", "RU", "JP"]
+
+FIRST_NAMES = [
+    "Emma", "Liam", "Olivia", "Noah", "Ava", "Ethan", "Sophia", "Mason",
+    "Isabella", "Logan", "Mia", "Lucas", "Charlotte", "Alexander", "Amelia",
+    "Daniel", "Harper", "Matthew", "Evelyn", "Aiden", "Luna", "Henry",
+    "Camila", "Sebastian", "Gianna", "Jack", "Aria", "Owen", "Ella", "Samuel",
+]
+
+LAST_NAMES = [
+    "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller",
+    "Davis", "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez",
+    "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin",
+    "Lee", "Perez", "Thompson", "White", "Harris", "Sanchez", "Clark",
+    "Ramirez", "Lewis", "Robinson",
+]
+
+EMPLOYMENT_STATUSES = ["employed", "employed", "employed", "self-employed", "unemployed"]
 
 CATEGORIES_WEIGHTED = (
     ["groceries"] * 20
@@ -90,6 +108,40 @@ def generate_transaction(applicant_id):
     }
 
 
+def generate_application():
+    first = random.choice(FIRST_NAMES)
+    last = random.choice(LAST_NAMES)
+    name = f"{first} {last}"
+    email = f"{first.lower()}.{last.lower()}@email.com"
+    ssn_last4 = f"{random.randint(1000, 9999)}"
+    annual_income = round(random.uniform(30000, 200000), 2)
+    requested_amount = round(random.uniform(5000, 75000), 2)
+    employment_status = random.choice(EMPLOYMENT_STATUSES)
+
+    return {
+        "applicant_name": name,
+        "email": email,
+        "ssn_last4": ssn_last4,
+        "annual_income": annual_income,
+        "requested_amount": requested_amount,
+        "employment_status": employment_status,
+    }
+
+
+def insert_application(conn, app):
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            INSERT INTO credit_applications (applicant_name, email, ssn_last4, annual_income, requested_amount, employment_status)
+            VALUES (%(applicant_name)s, %(email)s, %(ssn_last4)s, %(annual_income)s, %(requested_amount)s, %(employment_status)s)
+            RETURNING id
+            """,
+            app,
+        )
+        conn.commit()
+        return cur.fetchone()[0]
+
+
 def insert_transaction(conn, tx):
     with conn.cursor() as cur:
         cur.execute(
@@ -109,27 +161,44 @@ def main():
     applicant_ids = get_applicant_ids(conn)
 
     if not applicant_ids:
-        print("No applicants found. Submit some applications first.")
-        return
+        print("No applicants found — will create some.")
 
-    print(f"Generating transactions for {len(applicant_ids)} applicants...")
+    print("Simulating bank feed: transactions every ~1s, new applications every ~5s")
     print("Press Ctrl+C to stop.\n")
 
-    count = 0
+    tx_count = 0
+    app_count = 0
+    last_application_time = time.time()
+
     try:
         while True:
-            applicant_id = random.choice(applicant_ids)
-            tx = generate_transaction(applicant_id)
-            tx_id = insert_transaction(conn, tx)
-            count += 1
-            print(
-                f"[{count}] applicant={applicant_id} "
-                f"${tx['amount']:>9,.2f} {tx['category']:<14} "
-                f"{tx['merchant']:<20} {tx['location_country']}"
-            )
+            # New credit application every ~5 seconds
+            if time.time() - last_application_time >= 5:
+                app = generate_application()
+                app_id = insert_application(conn, app)
+                applicant_ids.append(app_id)
+                app_count += 1
+                print(
+                    f"  [NEW APP #{app_id}] {app['applicant_name']:<20} "
+                    f"${app['requested_amount']:>10,.2f} ({app['employment_status']})"
+                )
+                last_application_time = time.time()
+
+            # Transaction every ~1 second
+            if applicant_ids:
+                applicant_id = random.choice(applicant_ids)
+                tx = generate_transaction(applicant_id)
+                insert_transaction(conn, tx)
+                tx_count += 1
+                print(
+                    f"  [TX {tx_count}] applicant={applicant_id:<4} "
+                    f"${tx['amount']:>9,.2f} {tx['category']:<14} "
+                    f"{tx['merchant']:<20} {tx['location_country']}"
+                )
+
             time.sleep(random.uniform(0.5, 1.5))
     except KeyboardInterrupt:
-        print(f"\nStopped. Inserted {count} transactions.")
+        print(f"\nStopped. Inserted {tx_count} transactions, {app_count} applications.")
     finally:
         conn.close()
 
