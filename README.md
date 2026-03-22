@@ -32,8 +32,8 @@ uv run python manage.py runserver
 ```
 ├── config/                 # Django settings, urls, wsgi
 ├── creditapp/              # Django app (models, views, templates, admin)
-├── notebooks/
-│   └── fraud_analysis.ipynb  # Messy notebook — your starting point
+├── src/
+│   └── fraud/              # Extracted fraud rules (one file per rule)
 ├── scripts/
 │   └── transactions.py     # Transaction feed simulator (instructor-only)
 ├── manage.py
