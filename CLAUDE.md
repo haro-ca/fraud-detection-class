@@ -14,7 +14,7 @@ This is a learning environment. The goal is for the user to understand every lin
 
 ## Project overview
 
-Santandors is a Django credit application system with a fraud detection pipeline. The fraud logic currently lives in a messy Jupyter notebook (`notebooks/fraud_analysis.ipynb`) and needs to be productionized into proper Python modules.
+Santandors is a Django credit application system with a fraud detection pipeline. The fraud logic lives in `src/fraud/` as one module per rule, with a facade in `__init__.py` exposing `run_all()` and `score_applications()`.
 
 ## Commands
 
@@ -49,7 +49,7 @@ uv run ruff format .
 
 - `config/` — Django project settings, urls, wsgi
 - `creditapp/` — Django app with models, views, templates, admin
-- `notebooks/` — Jupyter notebooks (the messy fraud analysis lives here)
+- `src/fraud/` — Fraud detection rules (one file per rule, facade in `__init__.py`)
 - `scripts/` — Standalone scripts (transaction simulator, instructor-only)
 
 ## Database (Neon PostgreSQL)
