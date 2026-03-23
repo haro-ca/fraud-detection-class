@@ -16,6 +16,8 @@ dependencies = [
     "typer>=0.24.1",
     "rich>=14.3.3",
     "pyfiglet>=1.0.4",
+    "streamlit>=1.55.0",
+    "plotly>=6.6.0",
 ]
 
 [project.optional-dependencies]
