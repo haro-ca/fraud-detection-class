@@ -23,6 +23,10 @@ def write_fraud_results(results: list[dict]) -> None:
                     """
                     INSERT INTO fraud_results (application_id, rule_name, triggered, score, details)
                     VALUES (%(application_id)s, %(rule_name)s, %(triggered)s, %(score)s, %(details)s)
+                    ON CONFLICT (application_id, rule_name) DO UPDATE SET
+                        triggered = EXCLUDED.triggered,
+                        score = EXCLUDED.score,
+                        details = EXCLUDED.details
                     """,
                     r,
                 )

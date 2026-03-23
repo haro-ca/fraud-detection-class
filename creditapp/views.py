@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import CreditApplication, Transaction
@@ -24,7 +25,36 @@ def apply_credit(request):
 
 def application_status(request, application_id):
     application = get_object_or_404(CreditApplication, id=application_id)
-    return render(request, "creditapp/status.html", {"application": application})
+    fraud_results = application.fraud_results.order_by("rule_name")
+    return render(
+        request,
+        "creditapp/status.html",
+        {
+            "application": application,
+            "fraud_results": fraud_results,
+        },
+    )
+
+
+def application_status_api(request, application_id):
+    application = get_object_or_404(CreditApplication, id=application_id)
+    fraud_results = application.fraud_results.order_by("rule_name")
+    return JsonResponse(
+        {
+            "application_id": application.id,
+            "applicant_name": application.applicant_name,
+            "status": application.status,
+            "fraud_results": [
+                {
+                    "rule_name": r.rule_name,
+                    "triggered": r.triggered,
+                    "score": float(r.score) if r.score else None,
+                    "details": r.details,
+                }
+                for r in fraud_results
+            ],
+        }
+    )
 
 
 def transactions_feed(request):
