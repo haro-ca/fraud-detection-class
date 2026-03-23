@@ -33,7 +33,7 @@ def run(
 
     olap = create_store(store, db_path=db_path) if store == "duckdb" else create_store(store)
 
-    console.print(f"[bold]Running pipeline...[/bold]")
+    console.print("[bold]Running pipeline...[/bold]")
     if start_dt or end_dt:
         console.print(f"  Window: {start_dt or '...'} → {end_dt or '...'}")
     if limit:
@@ -144,6 +144,31 @@ def inspect(
         table.add_row(rule_name, triggered_str, f"[{score_color}]{score:.1f}[/{score_color}]", details)
 
     console.print(table)
+
+
+@app.command()
+def dashboard(
+    db_path: str = typer.Option("hound.db", help="DuckDB file path"),
+    port: int = typer.Option(8501, help="Port for the Streamlit server"),
+):
+    """Launch the Streamlit analytics dashboard."""
+    import os
+    import subprocess
+    import sys
+
+    banner()
+    console.print("[bold]Launching dashboard...[/bold]")
+    console.print(f"  DuckDB: {db_path}")
+    console.print(f"  Port: {port}\n")
+
+    env = os.environ.copy()
+    env["HOUND_DB_PATH"] = db_path
+
+    dashboard_path = os.path.join(os.path.dirname(__file__), "..", "dashboard", "app.py")
+    subprocess.run(
+        [sys.executable, "-m", "streamlit", "run", dashboard_path, "--server.port", str(port)],
+        env=env,
+    )
 
 
 if __name__ == "__main__":
