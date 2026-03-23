@@ -13,6 +13,9 @@ dependencies = [
     "matplotlib>=3.9",
     "seaborn>=0.13",
     "python-dotenv>=1.0",
+    "typer>=0.24.1",
+    "rich>=14.3.3",
+    "pyfiglet>=1.0.4",
 ]
 
 [project.optional-dependencies]
@@ -21,6 +24,7 @@ dev = [
     "pytest>=8.0",
     "pytest-django>=4.9",
 ]
+
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
