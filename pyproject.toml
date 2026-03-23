@@ -8,6 +8,7 @@ dependencies = [
     "django>=5.1",
     "psycopg2-binary>=2.9",
     "polars>=1.0",
+    "duckdb>=1.0",
     "jupyter>=1.0",
     "matplotlib>=3.9",
     "seaborn>=0.13",
