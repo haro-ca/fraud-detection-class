@@ -14,6 +14,9 @@ def run_pipeline(
     end: datetime | None = None,
     limit: int | None = None,
 ) -> dict:
+    if start is None:
+        start = olap_store.get_last_processed_at()
+
     applications = extract_applications(start=start, end=end, limit=limit)
     if applications.is_empty():
         return {"processed": 0, "start": start, "end": end}
@@ -31,10 +34,16 @@ def run_pipeline(
     else:
         max_tx_time = applications["created_at"].max()
 
-    all_applications = olap_store.query_applications_since(None)
-    all_transactions = olap_store.query_transactions_since(None)
+    # Run rules only against newly ingested applications
+    # but use all their transactions from OLAP for full history
+    new_apps = olap_store.query_applications_since(None).filter(
+        pl.col("id").is_in(app_ids)
+    )
+    all_transactions = olap_store.query_transactions_since(None).filter(
+        pl.col("applicant_id").is_in(app_ids)
+    )
 
-    results = run_all(all_transactions, all_applications)
+    results = run_all(all_transactions, new_apps)
     results_df = pl.DataFrame(results)
 
     if not results_df.is_empty():
