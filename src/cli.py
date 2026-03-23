@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime
 
 import pyfiglet
@@ -8,6 +9,15 @@ from rich.panel import Panel
 
 app = typer.Typer(help="HOUND — fraud detection pipeline CLI")
 console = Console()
+
+
+def _configure_logging(verbose: bool):
+    level = logging.DEBUG if verbose else logging.INFO
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+        datefmt="%H:%M:%S",
+    )
 
 
 def banner():
@@ -23,9 +33,11 @@ def run(
     limit: int = typer.Option(None, help="Max applications to process"),
     store: str = typer.Option("duckdb", help="OLAP store type (duckdb or databricks)"),
     db_path: str = typer.Option("hound.db", help="DuckDB file path"),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable debug logging"),
 ):
     """Trigger the fraud detection pipeline."""
     banner()
+    _configure_logging(verbose)
     from src.etl import create_store, run_pipeline
 
     start_dt = datetime.fromisoformat(start) if start else None
